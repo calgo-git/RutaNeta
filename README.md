@@ -15,7 +15,7 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 | Etapa | Rama | Contenido | Estado |
 |-------|------|-----------|--------|
 | 1 | `etapa-1-base` | Estructura, base de datos y conexión PDO | Lista |
-| 2 | `etapa-2-landing` | Landing page con CSS Grid | Pendiente |
+| 2 | `etapa-2-landing` | Landing page con CSS Grid | Lista |
 | 3 | `etapa-3-auth` | Registro, login, logout y protección CSRF | Pendiente |
 | 4 | `etapa-4-dashboard-ingresos` | Dashboard con KPIs y módulo de ingresos | Pendiente |
 | 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Pendiente |
@@ -23,7 +23,26 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 
 Cada rama nace de la anterior y funciona por sí sola. `main` solo recibe el merge de la entrega final.
 
-En esta etapa ya existen la base de datos y la conexión. Las páginas que se construyen en etapas posteriores muestran el aviso "Esta sección llega en la etapa N", así ningún enlace termina en una página en blanco.
+Hasta esta etapa existen la base de datos, la conexión y la landing page. Las páginas que se construyen en etapas posteriores muestran el aviso "Esta sección llega en la etapa N", así ningún enlace termina en una página en blanco.
+
+## Landing page
+
+`index.html` y `styles.css` forman la página de presentación. El esqueleto es CSS Grid con 5 áreas:
+
+```
+┌──────────┬──────────────────────────────────┐
+│  logo    │  header (banner)                 │
+├──────────┼──────────────────────────────────┤
+│ sidebar  │  cuerpo: problema, tabla,        │
+│          │  beneficios, registro rápido     │
+├──────────┴──────────────────────────────────┤
+│  footer (ancho completo)                    │
+└─────────────────────────────────────────────┘
+```
+
+En pantallas de menos de 768 px el mismo HTML se acomoda en una sola columna: solo cambia el mapa de `grid-template-areas`. Dentro de cada bloque se usa Flexbox. La landing no usa JavaScript.
+
+El formulario "Empieza gratis" manda nombre y email por GET a `registro.php`, que los precargará cuando exista el registro (etapa 3).
 
 ## Tecnologías
 
@@ -95,7 +114,9 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 
 - `http://localhost/RutaNeta/config/conexion.php` debe mostrar una **página en blanco**: la conexión funciona. Si aparece "No se pudo conectar…", revisa que MySQL esté encendido y los datos de `config/conexion.php`.
 - En phpMyAdmin, la base `rutaneta` debe tener 1 usuario, 5 ingresos y 8 gastos.
-- `http://localhost/RutaNeta/` y las demás páginas muestran el aviso de la etapa en que se construyen.
+- `http://localhost/RutaNeta/` muestra la landing: logo, banner azul noche, menú lateral, contenido y footer de ancho completo.
+- Al angostar la ventana por debajo de 768 px, la landing pasa a una sola columna.
+- "Empieza gratis" lleva a `registro.php?nombre=…&email=…`. Por ahora esa página muestra el aviso de la etapa 3, igual que las demás páginas del sistema.
 
 ## Usuario de prueba
 
