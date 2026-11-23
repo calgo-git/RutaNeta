@@ -19,11 +19,11 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 | 3 | `etapa-3-auth` | Registro, login, logout y protección CSRF | Lista |
 | 4 | `etapa-4-dashboard-ingresos` | Dashboard con KPIs y módulo de ingresos | Lista |
 | 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Lista |
-| 6 | `etapa-6-final` | Integración, pruebas de seguridad y entrega | Pendiente |
+| 6 | `etapa-6-final` | Integración, pruebas de seguridad y entrega | Lista |
 
-Cada rama nace de la anterior y funciona por sí sola. `main` solo recibe el merge de la entrega final.
+Cada rama nace de la anterior y funciona por sí sola. `main` contiene la entrega final, con la etiqueta `v1.0`.
 
-Hasta esta etapa el sistema está completo: base de datos, landing page, acceso (registro, login y logout), panel con KPI, ingresos, gastos e historial. La etapa 6 integra, prueba la seguridad y entrega la versión final.
+El sistema está completo y probado: landing page, registro, login y logout, panel con KPI, ingresos, gastos e historial. Las secciones de instalación y pruebas están al final de este archivo.
 
 ## Landing page
 
@@ -54,13 +54,15 @@ El formulario "Empieza gratis" manda nombre y email por GET a `registro.php`, qu
 | `logout.php` | Vacía la sesión, borra la cookie, destruye la sesión y regresa a `login.php` |
 | `dashboard.php` | Panel principal protegido (ver la sección siguiente) |
 
-Medidas de seguridad de esta etapa:
+Medidas de seguridad del acceso:
 
 - Las contraseñas se guardan como hash; la base de datos nunca tiene la contraseña real.
 - `session_regenerate_id(true)` al entrar: un id de sesión anterior ya no sirve.
+- La cookie de sesión es `HttpOnly` (JavaScript no la puede leer) y `SameSite=Lax` (no viaja en POSTs que vienen de otros sitios).
 - Cada formulario POST lleva un token CSRF oculto que PHP compara con `hash_equals()`; sin él, responde 403 y no procesa nada.
 - `requerir_login()` manda a `login.php` a quien abra una página interna sin sesión.
 - Todo lo que se imprime pasa por `htmlspecialchars()`.
+- La cabecera `X-Frame-Options: DENY` impide cargar RutaNeta dentro de un iframe de otro sitio.
 
 JavaScript (`js/app.js`) ayuda en el navegador: revisa que las dos contraseñas del registro coincidan antes de enviarlas y muestra u oculta la contraseña con el botón **Ver**. PHP vuelve a validar todo en el servidor.
 
@@ -158,37 +160,45 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 | Mes anterior | $3,810.50 | $4,499.00 | −$688.50 |
 | Mes actual | $3,080.00 | $2,389.00 | $691.00 |
 
+## Requisitos
+
+- XAMPP con Apache, PHP 8 y MySQL/MariaDB
+- Git, para clonar el repositorio
+- Un navegador actualizado
+
 ## Instalación en XAMPP
 
-1. Clona el repositorio dentro de `htdocs` para que Apache lo sirva:
+1. **Clona el proyecto dentro de `htdocs`**, la carpeta que sirve Apache:
 
    ```bash
    cd C:/xampp/htdocs
    git clone https://github.com/calgo-git/RutaNeta.git
    ```
 
-2. En el panel de XAMPP pulsa **Start** en **Apache** y en **MySQL**.
-3. Abre `http://localhost/phpmyadmin`, entra a la pestaña **Importar**, elige `sql/rutaneta.sql` y pulsa **Importar**. Si lo vuelves a importar, borra las tablas y las crea de nuevo con los datos de prueba.
-4. Revisa `config/conexion.php`. Los valores por defecto (`localhost`, puerto `3306`, usuario `root` sin contraseña) sirven para una instalación normal de XAMPP.
+   En macOS la carpeta es `/Applications/XAMPP/htdocs`. El proyecto debe quedar en `htdocs/RutaNeta`.
 
-## Probar esta etapa
+2. **Enciende los servicios:** en el panel de control de XAMPP pulsa **Start** en **Apache** y en **MySQL**.
 
-- `http://localhost/RutaNeta/config/conexion.php` debe mostrar una **página en blanco**: la conexión funciona. Si aparece "No se pudo conectar…", revisa que MySQL esté encendido y los datos de `config/conexion.php`.
-- En phpMyAdmin, la base `rutaneta` debe tener 1 usuario, 5 ingresos y 8 gastos.
-- `http://localhost/RutaNeta/` muestra la landing: logo, banner azul noche, menú lateral, contenido y footer de ancho completo.
-- Al angostar la ventana por debajo de 768 px, la landing pasa a una sola columna.
-- "Empieza gratis" lleva al registro con nombre y email ya puestos.
-- En el registro, dos contraseñas distintas muestran un aviso sin recargar la página. Al crear la cuenta llegas al login con el mensaje "¡Cuenta creada!", y en phpMyAdmin la columna `password` empieza con `$2y$`.
-- Entra con el usuario de prueba. Con los datos recién importados, el panel muestra $3,080.00 de ingresos, $2,389.00 de gastos, $691.00 de ganancia neta (en verde) y 16.0 horas.
-- En **Ingresos** registra uno: aparece "Ingreso guardado" y la fila nueva; el panel suma el monto. Al recargar con F5 no se duplica.
-- Haz clic en una fila para resaltarla. Pulsa **Eliminar**: con Cancelar no pasa nada; con Aceptar se borra.
-- Validación del servidor: con F12 quita el `min` del campo Monto, escribe 0 y guarda. Sale "El monto debe ser mayor que 0" y no se inserta nada.
-- En **Gastos** registra uno marcado como fijo: aparece con la etiqueta "Fijo" y los subtotales por categoría se actualizan.
-- Filtra por "Seguro": quedan solo esas filas. Elige una categoría sin gastos: aparece "No tienes gastos en esa categoría".
-- En **Historial**, con los datos de prueba, el mes actual sale en verde ($691.00) y el anterior en rojo (−$688.50). Cambia el mes en el selector: la URL queda como `historial.php?mes=AAAA-MM`.
-- "Cerrar sesión" te regresa al login.
-- En una ventana privada abre `http://localhost/RutaNeta/dashboard.php`: te manda al login.
-- Prueba CSRF: en el login, con F12 borra el `<input name="csrf_token">` y pulsa Entrar. Sale "El formulario expiró o no vino de RutaNeta" con respuesta 403.
+3. **Importa la base de datos:**
+   1. Abre `http://localhost/phpmyadmin`.
+   2. Entra a la pestaña **Importar**.
+   3. Elige `sql/rutaneta.sql` y pulsa **Importar**.
+
+   El script crea la base `rutaneta`, sus 3 tablas y los datos de prueba. Si lo importas otra vez, borra las tablas y las crea de nuevo: sirve para regresar a los datos de prueba.
+
+4. **Configura la conexión** en `config/conexion.php`. Los valores por defecto sirven para una instalación normal de XAMPP:
+
+   ```php
+   $servidor   = 'localhost';
+   $puerto     = '3306';
+   $base_datos = 'rutaneta';
+   $usuario_bd = 'root';
+   $clave_bd   = '';
+   ```
+
+   Cambia `$clave_bd` si le pusiste contraseña a `root`, o `$puerto` si moviste MySQL de puerto (por ejemplo, a 3307). Para comprobar la conexión abre `http://localhost/RutaNeta/config/conexion.php`: una página en blanco significa que conecta.
+
+5. **Abre el proyecto** en `http://localhost/RutaNeta/`.
 
 ## Usuario de prueba
 
@@ -196,4 +206,47 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 |-------|------------|
 | `demo@rutaneta.test` | `demo1234` |
 
-Es la única contraseña del repositorio y existe solo para pruebas.
+Es la única contraseña del repositorio y existe solo para pruebas. Con los datos recién importados, su panel muestra $3,080.00 de ingresos, $2,389.00 de gastos, $691.00 de ganancia neta y 16.0 horas.
+
+## Recorrido de prueba
+
+1. En la landing escribe nombre y email en "Empieza gratis": llegas al registro con esos datos puestos.
+2. Crea la cuenta (si las contraseñas no coinciden, JS avisa sin recargar) y entra con ella.
+3. En **Ingresos** registra un pago; en **Gastos** registra un gasto marcado como fijo.
+4. En **Panel** revisa que los 4 indicadores cambiaron.
+5. En **Historial** compara el mes actual con los anteriores.
+6. Elimina un registro: el sistema pide confirmación.
+7. Cierra sesión.
+
+## Pruebas de seguridad
+
+Resultados del 23/11/2026, probados con PHP 8.3 y MariaDB 10.11 (los mismos motores de XAMPP) y un navegador real. No se ejecutaron dentro de XAMPP.
+
+| Prueba | Cómo se hizo | Resultado |
+|--------|--------------|-----------|
+| Abrir páginas internas sin sesión | Pedir `dashboard.php`, `ingresos.php`, `gastos.php` e `historial.php` sin haber iniciado sesión | Las 4 responden con una redirección a `login.php`. **Pasa** |
+| Borrar un registro de otro usuario cambiando el `id` | Con la cuenta de otro usuario, cambiar con F12 el `<input name="id">` de una fila por `1` (un registro del usuario demo) y pulsar Eliminar, en ingresos y en gastos | Mensaje "No se encontró ese ingreso / gasto en tu cuenta." y el registro del demo sigue en la BD. **Pasa** |
+| Enviar un formulario sin token CSRF | Borrar con F12 el `<input name="csrf_token">` y enviar registro, login, alta de ingreso y alta de gasto | Los 4 responden 403 con "El formulario expiró o no vino de RutaNeta…" y no guardan nada. **Pasa** |
+| Inyección SQL en el login | Escribir `' OR '1'='1` como email y contraseña | "Email o contraseña incorrectos." **Pasa** |
+| HTML en los campos de texto | Guardar `<script>alert(1)</script>` en las notas de un ingreso | Se muestra como texto, no se ejecuta. **Pasa** |
+| Cookie de sesión | Revisar `PHPSESSID` en F12 → Application → Cookies | `HttpOnly` y `SameSite=Lax`; `document.cookie` no la ve. **Pasa** |
+| RutaNeta dentro de un iframe | Cargar `login.php` en un `<iframe>` de otra página | El navegador lo bloquea por `X-Frame-Options: DENY`. **Pasa** |
+
+## Revisión de consistencia
+
+| Lista | Base de datos | Formularios | JavaScript |
+|-------|---------------|-------------|------------|
+| Plataformas (6) | `VARCHAR(50)`; PHP solo acepta la lista | El mismo arreglo de 6 valores en `registro.php` e `ingresos.php` | No tiene lista propia |
+| Vehículos (4) | `VARCHAR(50)`; PHP solo acepta la lista | Arreglo en `registro.php` | No tiene lista propia |
+| Categorías (14) | `ENUM` en `sql/rutaneta.sql` | `$categorias` en `gastos.php`, con las mismas 14 claves y en el mismo orden; el formulario y el filtro salen de ahí | Lee `data-categoria` del HTML |
+
+## Seguridad aplicada
+
+- Contraseñas con `password_hash()` y `password_verify()`.
+- `requerir_login()` al inicio de cada página interna.
+- Todas las consultas con PDO, `prepare()` y parámetros.
+- Toda lectura y borrado filtra por el `usuario_id` de la sesión, nunca por un dato del formulario o de la URL.
+- Token CSRF en todos los formularios POST, comparado con `hash_equals()`.
+- Eliminar siempre es POST con token CSRF.
+- Salidas escapadas con `htmlspecialchars()`.
+- Sesión regenerada al iniciar sesión, cookie `HttpOnly` y `SameSite=Lax`, y `X-Frame-Options: DENY`.
