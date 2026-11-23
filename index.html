@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RutaNeta · Tu ganancia neta real</title>
+    <meta name="description" content="RutaNeta calcula la ganancia neta real de conductores de Rappi, DiDi, Uber, Mercado Libre Envíos y Amazon Flex.">
+    <!-- La landing usa su propia hoja de estilos; el sistema interno usa css/estilos.css -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- .pagina es el contenedor Grid. Cada hijo directo ocupa un área del mapa
+         definido en styles.css: logo, header, sidebar, cuerpo y footer. -->
+    <div class="pagina">
+
+        <!-- Área "logo": fondo blanco, porque la R y "Ruta" son oscuras y
+             desaparecerían sobre el azul noche del banner -->
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="RutaNeta"></a>
+            <p>Tu ganancia neta, sin cuentos.</p>
+        </div>
+
+        <!-- Área "header": el banner con la propuesta y los accesos al sistema -->
+        <header class="banner" id="inicio">
+            <p class="banner-etiqueta">Para conductores de Rappi, DiDi, Uber, Mercado Libre Envíos y Amazon Flex</p>
+            <h1>¿Cuánto ganaste <span>de verdad</span> esta semana?</h1>
+            <p class="banner-texto">La plataforma te deposita. Tú pagas gasolina, aceite, llantas, seguro, lavados, multas y datos. RutaNeta resta todo y te dice cuánto te queda.</p>
+            <div class="banner-acciones">
+                <!-- Estos enlaces conectan la landing con las páginas PHP del sistema (etapa 3) -->
+                <a href="registro.php" class="btn btn-primario">Crear cuenta gratis</a>
+                <a href="login.php" class="btn btn-contorno">Ya tengo cuenta</a>
+            </div>
+        </header>
+
+        <!-- Área "sidebar": navegación por las secciones de la página -->
+        <aside class="sidebar">
+            <nav aria-label="Secciones de la página">
+                <h2>En esta página</h2>
+                <ul>
+                    <li><a href="#problema">El problema</a></li>
+                    <li><a href="#ejemplo">Una semana real</a></li>
+                    <li><a href="#beneficios">Qué hace RutaNeta</a></li>
+                    <li><a href="#empezar">Empieza gratis</a></li>
+                </ul>
+                <h2>Sistema</h2>
+                <ul>
+                    <li><a href="login.php">Iniciar sesión</a></li>
+                    <li><a href="registro.php">Crear cuenta</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Área "cuerpo": el contenido. Dentro de cada bloque manda Flexbox. -->
+        <main class="cuerpo">
+
+            <section class="bloque" id="problema">
+                <h2>El problema: confundir lo que te pagan con lo que ganas</h2>
+                <p>Lo que la app te deposita es tu ingreso <strong>bruto</strong>. Para trabajar gastaste en gasolina, desgaste del vehículo, seguro y datos del celular. Lo que queda después de restar todo eso es tu ganancia <strong>neta</strong>: el dinero que de verdad es tuyo.</p>
+                <div class="comparacion">
+                    <div class="cifra">
+                        <span class="cifra-etiqueta">Lo que crees que ganaste</span>
+                        <span class="cifra-valor">$3,000.00</span>
+                    </div>
+                    <div class="cifra cifra-neta">
+                        <span class="cifra-etiqueta">Lo que de verdad te quedó</span>
+                        <span class="cifra-valor">$1,575.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bloque" id="ejemplo">
+                <h2>Una semana real de un conductor</h2>
+                <p>Así se ve la cuenta completa de una semana con depósitos de Uber y DiDi:</p>
+                <div class="tabla-scroll">
+                    <table class="tabla-semana">
+                        <thead>
+                            <tr>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col" class="num">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Depósitos de Uber y DiDi</td>
+                                <td>Ingreso</td>
+                                <td class="num">+$3,000.00</td>
+                            </tr>
+                            <tr>
+                                <td>Gasolina</td>
+                                <td>Gasto variable</td>
+                                <td class="num">−$780.00</td>
+                            </tr>
+                            <tr>
+                                <td>Seguro (parte de la semana)</td>
+                                <td>Gasto fijo</td>
+                                <td class="num">−$290.00</td>
+                            </tr>
+                            <tr>
+                                <td>Aceite y llantas (desgaste prorrateado)</td>
+                                <td>Gasto variable</td>
+                                <td class="num">−$160.00</td>
+                            </tr>
+                            <tr>
+                                <td>Lavado</td>
+                                <td>Gasto variable</td>
+                                <td class="num">−$120.00</td>
+                            </tr>
+                            <tr>
+                                <td>Datos móviles (parte de la semana)</td>
+                                <td>Gasto fijo</td>
+                                <td class="num">−$75.00</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row" colspan="2">Ganancia neta real</th>
+                                <td class="num">$1,575.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <p class="nota">Casi la mitad de lo depositado se fue en gastos de trabajo.</p>
+            </section>
+
+            <section class="bloque" id="beneficios">
+                <h2>Qué hace RutaNeta por ti</h2>
+                <div class="tarjetas">
+                    <article class="tarjeta">
+                        <h3>Registra cada pago</h3>
+                        <p>Anota lo que te pagó cada plataforma, las horas que trabajaste y los kilómetros que recorriste.</p>
+                    </article>
+                    <article class="tarjeta">
+                        <h3>Clasifica tus gastos</h3>
+                        <p>14 categorías pensadas para conductores: gasolina, llantas, frenos, tenencia, verificación, multas y más.</p>
+                    </article>
+                    <article class="tarjeta">
+                        <h3>Ve tu neta del mes</h3>
+                        <p>Un panel con ingresos, gastos, ganancia neta y horas trabajadas del mes en curso.</p>
+                    </article>
+                    <article class="tarjeta">
+                        <h3>Compara meses</h3>
+                        <p>Un historial de 6 meses que te muestra en verde los meses que ganaste y en rojo los que perdiste.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="bloque bloque-registro" id="empezar">
+                <h2>Empieza gratis en un minuto</h2>
+                <p>Escribe tu nombre y tu email. Te llevamos al registro con los datos ya puestos.</p>
+                <!-- La landing es HTML estático y no guarda datos: el formulario manda
+                     nombre y email por GET a registro.php, que los precarga (etapa 3). -->
+                <form action="registro.php" method="get" class="form-registro">
+                    <div class="campo">
+                        <label for="lead-nombre">Nombre</label>
+                        <input type="text" id="lead-nombre" name="nombre" maxlength="100" required>
+                    </div>
+                    <div class="campo">
+                        <label for="lead-email">Email</label>
+                        <input type="email" id="lead-email" name="email" maxlength="150" required>
+                    </div>
+                    <button type="submit" class="btn btn-primario">Crear mi cuenta</button>
+                </form>
+            </section>
+
+        </main>
+
+        <!-- Área "footer": ocupa las dos columnas del Grid -->
+        <footer class="pie">
+            <div class="pie-columna">
+                <strong>RutaNeta</strong>
+                <p>Ganancia neta real para conductores de plataformas digitales.</p>
+            </div>
+            <div class="pie-columna">
+                <strong>Plataformas</strong>
+                <p>Rappi · DiDi · Uber · Mercado Libre Envíos · Amazon Flex</p>
+            </div>
+            <div class="pie-columna">
+                <strong>Accesos</strong>
+                <p><a href="login.php">Iniciar sesión</a> · <a href="registro.php">Crear cuenta</a></p>
+            </div>
+            <p class="pie-legal">© 2026 RutaNeta</p>
+        </footer>
+
+    </div>
+</body>
+</html>
