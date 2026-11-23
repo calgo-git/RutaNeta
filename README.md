@@ -16,14 +16,14 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 |-------|------|-----------|--------|
 | 1 | `etapa-1-base` | Estructura, base de datos y conexión PDO | Lista |
 | 2 | `etapa-2-landing` | Landing page con CSS Grid | Lista |
-| 3 | `etapa-3-auth` | Registro, login, logout y protección CSRF | Pendiente |
+| 3 | `etapa-3-auth` | Registro, login, logout y protección CSRF | Lista |
 | 4 | `etapa-4-dashboard-ingresos` | Dashboard con KPIs y módulo de ingresos | Pendiente |
 | 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Pendiente |
 | 6 | `etapa-6-final` | Integración, pruebas de seguridad y entrega | Pendiente |
 
 Cada rama nace de la anterior y funciona por sí sola. `main` solo recibe el merge de la entrega final.
 
-Hasta esta etapa existen la base de datos, la conexión y la landing page. Las páginas que se construyen en etapas posteriores muestran el aviso "Esta sección llega en la etapa N", así ningún enlace termina en una página en blanco.
+Hasta esta etapa existen la base de datos, la conexión, la landing page y el acceso (registro, login y logout). Las páginas que se construyen en etapas posteriores muestran el aviso "Esta sección llega en la etapa N", así ningún enlace termina en una página en blanco.
 
 ## Landing page
 
@@ -42,7 +42,27 @@ Hasta esta etapa existen la base de datos, la conexión y la landing page. Las p
 
 En pantallas de menos de 768 px el mismo HTML se acomoda en una sola columna: solo cambia el mapa de `grid-template-areas`. Dentro de cada bloque se usa Flexbox. La landing no usa JavaScript.
 
-El formulario "Empieza gratis" manda nombre y email por GET a `registro.php`, que los precargará cuando exista el registro (etapa 3).
+El formulario "Empieza gratis" manda nombre y email por GET a `registro.php`, que los precarga en sus campos.
+
+## Acceso: registro, login y sesión
+
+| Archivo | Qué hace |
+|---------|----------|
+| `config/sesion.php` | Arranca la sesión en cada página y ofrece `requerir_login()`, el token CSRF y los mensajes que se muestran una sola vez |
+| `registro.php` | Valida el formulario en PHP, revisa que el email no exista, guarda la contraseña con `password_hash()` y redirige a `login.php` |
+| `login.php` | Busca el email con PDO, compara con `password_verify()`, regenera el id de sesión y guarda `usuario_id` y `nombre` en `$_SESSION` |
+| `logout.php` | Vacía la sesión, borra la cookie, destruye la sesión y regresa a `login.php` |
+| `dashboard.php` | Por ahora, página protegida que saluda al conductor; el panel con KPI llega en la etapa 4 |
+
+Medidas de seguridad de esta etapa:
+
+- Las contraseñas se guardan como hash; la base de datos nunca tiene la contraseña real.
+- `session_regenerate_id(true)` al entrar: un id de sesión anterior ya no sirve.
+- Cada formulario POST lleva un token CSRF oculto que PHP compara con `hash_equals()`; sin él, responde 403 y no procesa nada.
+- `requerir_login()` manda a `login.php` a quien abra una página interna sin sesión.
+- Todo lo que se imprime pasa por `htmlspecialchars()`.
+
+JavaScript (`js/app.js`) ayuda en el navegador: revisa que las dos contraseñas del registro coincidan antes de enviarlas y muestra u oculta la contraseña con el botón **Ver**. PHP vuelve a validar todo en el servidor.
 
 ## Tecnologías
 
@@ -116,7 +136,11 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 - En phpMyAdmin, la base `rutaneta` debe tener 1 usuario, 5 ingresos y 8 gastos.
 - `http://localhost/RutaNeta/` muestra la landing: logo, banner azul noche, menú lateral, contenido y footer de ancho completo.
 - Al angostar la ventana por debajo de 768 px, la landing pasa a una sola columna.
-- "Empieza gratis" lleva a `registro.php?nombre=…&email=…`. Por ahora esa página muestra el aviso de la etapa 3, igual que las demás páginas del sistema.
+- "Empieza gratis" lleva al registro con nombre y email ya puestos.
+- En el registro, dos contraseñas distintas muestran un aviso sin recargar la página. Al crear la cuenta llegas al login con el mensaje "¡Cuenta creada!", y en phpMyAdmin la columna `password` empieza con `$2y$`.
+- Entra con el usuario de prueba: llegas a `dashboard.php`, que te saluda por tu nombre. "Cerrar sesión" te regresa al login.
+- En una ventana privada abre `http://localhost/RutaNeta/dashboard.php`: te manda al login.
+- Prueba CSRF: en el login, con F12 borra el `<input name="csrf_token">` y pulsa Entrar. Sale "El formulario expiró o no vino de RutaNeta" con respuesta 403.
 
 ## Usuario de prueba
 
@@ -124,4 +148,4 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 |-------|------------|
 | `demo@rutaneta.test` | `demo1234` |
 
-Es la única contraseña del repositorio y existe solo para pruebas. Se podrá usar a partir de la etapa 3, cuando exista el login.
+Es la única contraseña del repositorio y existe solo para pruebas.
