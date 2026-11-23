@@ -21,7 +21,7 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 | 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Lista |
 | 6 | `etapa-6-final` | Integración, pruebas de seguridad y entrega | Lista |
 
-Cada rama nace de la anterior y funciona por sí sola. `main` contiene la entrega final, con la etiqueta `v1.0`.
+Cada rama nace de la anterior y funciona por sí sola. `main` contiene la entrega final (v1.0), que llegó con el merge de `etapa-6-final`.
 
 El sistema está completo y probado: landing page, registro, login y logout, panel con KPI, ingresos, gastos e historial. Las secciones de instalación y pruebas están al final de este archivo.
 
