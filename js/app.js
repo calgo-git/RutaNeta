@@ -5,7 +5,7 @@
 // sus elementos y, si la página no los tiene, no hace nada.
 // Etapa 3: mostrar contraseña y validar el registro.
 // Etapa 4: confirmar antes de eliminar y resaltar filas.
-// Etapa 5: color del neto en el historial.
+// Etapa 5: color del neto y filtro de gastos.
 // =====================================================================
 
 // ===== Etapa 3 · Acceso (login y registro) =====
@@ -73,7 +73,7 @@ document.querySelectorAll('.tabla-seleccionable tbody tr').forEach(function (fil
     });
 });
 
-// ===== Etapa 5 · Historial =====
+// ===== Etapa 5 · Historial y gastos =====
 
 // Historial: PHP deja el neto en data-neto y JS pinta verde o rojo al cargar la página
 document.querySelectorAll('[data-neto]').forEach(function (elemento) {
@@ -82,3 +82,26 @@ document.querySelectorAll('[data-neto]').forEach(function (elemento) {
     elemento.classList.toggle('positivo', neto > 0);
     elemento.classList.toggle('negativo', neto < 0);
 });
+
+// Gastos: filtrar la tabla por categoría sin recargar la página
+const filtroCategoria = document.getElementById('filtro-categoria');
+
+if (filtroCategoria) {
+    const filasGastos = document.querySelectorAll('#tabla-gastos tbody tr');
+    const sinResultados = document.getElementById('sin-resultados');
+
+    filtroCategoria.addEventListener('change', function () {
+        let visibles = 0;
+
+        filasGastos.forEach(function (fila) {
+            const coincide = filtroCategoria.value === 'todas' || fila.dataset.categoria === filtroCategoria.value;
+            fila.classList.toggle('oculto', !coincide);
+            if (coincide) {
+                visibles++;
+            }
+        });
+
+        // Si ninguna fila coincide, aparece el aviso "sin resultados"
+        sinResultados.classList.toggle('oculto', visibles > 0);
+    });
+}
