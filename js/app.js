@@ -5,6 +5,7 @@
 // sus elementos y, si la página no los tiene, no hace nada.
 // Etapa 3: mostrar contraseña y validar el registro.
 // Etapa 4: confirmar antes de eliminar y resaltar filas.
+// Etapa 5: color del neto en el historial.
 // =====================================================================
 
 // ===== Etapa 3 · Acceso (login y registro) =====
@@ -70,4 +71,14 @@ document.querySelectorAll('.tabla-seleccionable tbody tr').forEach(function (fil
         }
         fila.classList.toggle('seleccionada');
     });
+});
+
+// ===== Etapa 5 · Historial =====
+
+// Historial: PHP deja el neto en data-neto y JS pinta verde o rojo al cargar la página
+document.querySelectorAll('[data-neto]').forEach(function (elemento) {
+    const neto = parseFloat(elemento.dataset.neto);
+
+    elemento.classList.toggle('positivo', neto > 0);
+    elemento.classList.toggle('negativo', neto < 0);
 });
