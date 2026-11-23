@@ -18,12 +18,12 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 | 2 | `etapa-2-landing` | Landing page con CSS Grid | Lista |
 | 3 | `etapa-3-auth` | Registro, login, logout y protección CSRF | Lista |
 | 4 | `etapa-4-dashboard-ingresos` | Dashboard con KPIs y módulo de ingresos | Lista |
-| 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Pendiente |
+| 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Lista |
 | 6 | `etapa-6-final` | Integración, pruebas de seguridad y entrega | Pendiente |
 
 Cada rama nace de la anterior y funciona por sí sola. `main` solo recibe el merge de la entrega final.
 
-Hasta esta etapa existen la base de datos, la conexión, la landing page, el acceso (registro, login y logout), el panel con KPI y el módulo de ingresos. Gastos e Historial ya son páginas protegidas dentro del menú, con el aviso "Esta sección llega en la etapa 5", así ningún enlace termina en una página en blanco.
+Hasta esta etapa el sistema está completo: base de datos, landing page, acceso (registro, login y logout), panel con KPI, ingresos, gastos e historial. La etapa 6 integra, prueba la seguridad y entrega la versión final.
 
 ## Landing page
 
@@ -88,6 +88,22 @@ Debajo aparece la tabla de los últimos 5 ingresos.
 Después de guardar o borrar, PHP redirige a la misma página (Post/Redirect/Get): recargar no duplica el registro.
 
 En el navegador, `js/app.js` pide confirmación antes de eliminar y resalta la fila en la que haces clic. El hover de las filas es solo CSS.
+
+## Gastos e historial
+
+**`gastos.php`** sigue el mismo patrón que ingresos (registrar, listar y eliminar con las mismas reglas de seguridad):
+
+- El formulario pide categoría, descripción, monto, fecha y si el gasto es fijo. Las 14 categorías del `<select>` salen del mismo arreglo PHP que valida el servidor, y sus claves son idénticas al `ENUM` de la tabla `gastos`.
+- `es_fijo` solo es una etiqueta (Fijo / Variable): el sistema no repite gastos solo, cada mes se registran.
+- Los subtotales por categoría los calcula MySQL con `GROUP BY` y `SUM`, con el porcentaje de cada categoría sobre el total.
+- El filtro por categoría oculta y muestra filas con una clase CSS, sin recargar la página.
+
+**`historial.php`** compara meses:
+
+- El `<input type="month">` manda el mes por GET (por defecto, el mes actual). Solo consulta, así que no necesita token CSRF.
+- MySQL suma ingresos y gastos de los 6 meses que terminan en el mes elegido con `GROUP BY` por mes; los meses sin movimientos salen en cero.
+- La tabla muestra Ingresos | Gastos | Neto por mes, más el total de los 6 meses.
+- PHP deja cada neto en el atributo `data-neto`; al cargar la página, `js/app.js` lo pinta en verde si es positivo y en rojo si es negativo.
 
 ## Tecnologías
 
@@ -167,7 +183,10 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 - En **Ingresos** registra uno: aparece "Ingreso guardado" y la fila nueva; el panel suma el monto. Al recargar con F5 no se duplica.
 - Haz clic en una fila para resaltarla. Pulsa **Eliminar**: con Cancelar no pasa nada; con Aceptar se borra.
 - Validación del servidor: con F12 quita el `min` del campo Monto, escribe 0 y guarda. Sale "El monto debe ser mayor que 0" y no se inserta nada.
-- **Gastos** e **Historial** abren dentro del menú con el aviso de la etapa 5. "Cerrar sesión" te regresa al login.
+- En **Gastos** registra uno marcado como fijo: aparece con la etiqueta "Fijo" y los subtotales por categoría se actualizan.
+- Filtra por "Seguro": quedan solo esas filas. Elige una categoría sin gastos: aparece "No tienes gastos en esa categoría".
+- En **Historial**, con los datos de prueba, el mes actual sale en verde ($691.00) y el anterior en rojo (−$688.50). Cambia el mes en el selector: la URL queda como `historial.php?mes=AAAA-MM`.
+- "Cerrar sesión" te regresa al login.
 - En una ventana privada abre `http://localhost/RutaNeta/dashboard.php`: te manda al login.
 - Prueba CSRF: en el login, con F12 borra el `<input name="csrf_token">` y pulsa Entrar. Sale "El formulario expiró o no vino de RutaNeta" con respuesta 403.
 
