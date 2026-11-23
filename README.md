@@ -17,13 +17,13 @@ Ganancia neta del mes = ingresos del mes − gastos del mes
 | 1 | `etapa-1-base` | Estructura, base de datos y conexión PDO | Lista |
 | 2 | `etapa-2-landing` | Landing page con CSS Grid | Lista |
 | 3 | `etapa-3-auth` | Registro, login, logout y protección CSRF | Lista |
-| 4 | `etapa-4-dashboard-ingresos` | Dashboard con KPIs y módulo de ingresos | Pendiente |
+| 4 | `etapa-4-dashboard-ingresos` | Dashboard con KPIs y módulo de ingresos | Lista |
 | 5 | `etapa-5-gastos-historial` | Módulo de gastos e historial mensual | Pendiente |
 | 6 | `etapa-6-final` | Integración, pruebas de seguridad y entrega | Pendiente |
 
 Cada rama nace de la anterior y funciona por sí sola. `main` solo recibe el merge de la entrega final.
 
-Hasta esta etapa existen la base de datos, la conexión, la landing page y el acceso (registro, login y logout). Las páginas que se construyen en etapas posteriores muestran el aviso "Esta sección llega en la etapa N", así ningún enlace termina en una página en blanco.
+Hasta esta etapa existen la base de datos, la conexión, la landing page, el acceso (registro, login y logout), el panel con KPI y el módulo de ingresos. Gastos e Historial ya son páginas protegidas dentro del menú, con el aviso "Esta sección llega en la etapa 5", así ningún enlace termina en una página en blanco.
 
 ## Landing page
 
@@ -52,7 +52,7 @@ El formulario "Empieza gratis" manda nombre y email por GET a `registro.php`, qu
 | `registro.php` | Valida el formulario en PHP, revisa que el email no exista, guarda la contraseña con `password_hash()` y redirige a `login.php` |
 | `login.php` | Busca el email con PDO, compara con `password_verify()`, regenera el id de sesión y guarda `usuario_id` y `nombre` en `$_SESSION` |
 | `logout.php` | Vacía la sesión, borra la cookie, destruye la sesión y regresa a `login.php` |
-| `dashboard.php` | Por ahora, página protegida que saluda al conductor; el panel con KPI llega en la etapa 4 |
+| `dashboard.php` | Panel principal protegido (ver la sección siguiente) |
 
 Medidas de seguridad de esta etapa:
 
@@ -63,6 +63,31 @@ Medidas de seguridad de esta etapa:
 - Todo lo que se imprime pasa por `htmlspecialchars()`.
 
 JavaScript (`js/app.js`) ayuda en el navegador: revisa que las dos contraseñas del registro coincidan antes de enviarlas y muestra u oculta la contraseña con el botón **Ver**. PHP vuelve a validar todo en el servidor.
+
+## Panel e ingresos
+
+Las páginas internas comparten un layout con Flexbox: menú lateral a la izquierda (con el logo sobre un bloque blanco) y área principal a la derecha. En pantallas angostas el menú pasa arriba.
+
+**`dashboard.php`** muestra 4 indicadores del mes en curso, calculados por la base de datos:
+
+| Indicador | Cálculo |
+|-----------|---------|
+| Ingresos del mes | Suma de `ingresos.monto` con fecha en el mes |
+| Gastos del mes | Suma de `gastos.monto` con fecha en el mes (fijos y variables) |
+| Ganancia neta | Ingresos del mes − gastos del mes; verde si hay ganancia, rojo si hay pérdida |
+| Horas trabajadas | Suma de `ingresos.horas_trab` del mes, con la ganancia neta por hora |
+
+Debajo aparece la tabla de los últimos 5 ingresos.
+
+**`ingresos.php`** atiende tres casos en un solo archivo:
+
+- **Registrar:** plataforma, monto, horas, kilómetros, fecha y notas. PHP valida que el monto sea mayor que 0, que horas y kilómetros sean 0 o más, que la fecha exista y que la plataforma esté en la lista. Si algo falla, muestra el error y no inserta nada.
+- **Listar:** todos los ingresos del conductor, del más reciente al más antiguo.
+- **Eliminar:** un POST con token CSRF. El `DELETE` filtra por el `usuario_id` de la sesión: cambiar el id en el formulario no borra registros de otra cuenta.
+
+Después de guardar o borrar, PHP redirige a la misma página (Post/Redirect/Get): recargar no duplica el registro.
+
+En el navegador, `js/app.js` pide confirmación antes de eliminar y resalta la fila en la que haces clic. El hover de las filas es solo CSS.
 
 ## Tecnologías
 
@@ -138,7 +163,11 @@ Los datos de prueba se fechan el día que importas el script, repartidos en el m
 - Al angostar la ventana por debajo de 768 px, la landing pasa a una sola columna.
 - "Empieza gratis" lleva al registro con nombre y email ya puestos.
 - En el registro, dos contraseñas distintas muestran un aviso sin recargar la página. Al crear la cuenta llegas al login con el mensaje "¡Cuenta creada!", y en phpMyAdmin la columna `password` empieza con `$2y$`.
-- Entra con el usuario de prueba: llegas a `dashboard.php`, que te saluda por tu nombre. "Cerrar sesión" te regresa al login.
+- Entra con el usuario de prueba. Con los datos recién importados, el panel muestra $3,080.00 de ingresos, $2,389.00 de gastos, $691.00 de ganancia neta (en verde) y 16.0 horas.
+- En **Ingresos** registra uno: aparece "Ingreso guardado" y la fila nueva; el panel suma el monto. Al recargar con F5 no se duplica.
+- Haz clic en una fila para resaltarla. Pulsa **Eliminar**: con Cancelar no pasa nada; con Aceptar se borra.
+- Validación del servidor: con F12 quita el `min` del campo Monto, escribe 0 y guarda. Sale "El monto debe ser mayor que 0" y no se inserta nada.
+- **Gastos** e **Historial** abren dentro del menú con el aviso de la etapa 5. "Cerrar sesión" te regresa al login.
 - En una ventana privada abre `http://localhost/RutaNeta/dashboard.php`: te manda al login.
 - Prueba CSRF: en el login, con F12 borra el `<input name="csrf_token">` y pulsa Entrar. Sale "El formulario expiró o no vino de RutaNeta" con respuesta 403.
 
