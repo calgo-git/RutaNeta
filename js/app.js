@@ -4,6 +4,7 @@
 // <body>: cuando este archivo corre, el HTML ya existe. Cada bloque busca
 // sus elementos y, si la página no los tiene, no hace nada.
 // Etapa 3: mostrar contraseña y validar el registro.
+// Etapa 4: confirmar antes de eliminar y resaltar filas.
 // =====================================================================
 
 // ===== Etapa 3 · Acceso (login y registro) =====
@@ -47,3 +48,26 @@ if (formRegistro) {
         }
     });
 }
+
+// ===== Etapa 4 · Tablas y eliminación =====
+
+// Confirmar antes de eliminar: si el conductor cancela, el POST no sale
+document.querySelectorAll('.form-eliminar').forEach(function (formulario) {
+    formulario.addEventListener('submit', function (evento) {
+        if (!confirm('¿Eliminar este registro? No se puede deshacer.')) {
+            evento.preventDefault();
+        }
+    });
+});
+
+// Clic en una fila: se marca o desmarca con la clase "seleccionada".
+// El hover lo hace CSS; JS solo responde al clic.
+document.querySelectorAll('.tabla-seleccionable tbody tr').forEach(function (fila) {
+    fila.addEventListener('click', function (evento) {
+        // Un clic en el botón Eliminar no marca la fila
+        if (evento.target.closest('button')) {
+            return;
+        }
+        fila.classList.toggle('seleccionada');
+    });
+});
