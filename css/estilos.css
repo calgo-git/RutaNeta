@@ -3,6 +3,7 @@
    Lo cargan login.php, registro.php y las páginas internas.
    Etapa 3: paleta, base, formularios y pantallas de acceso.
    Etapa 4: layout con Flexbox (menú lateral + área principal), KPI y tablas.
+   Etapa 5: gastos (filtro, etiquetas, subtotales) e historial (neto en color).
    ===================================================================== */
 
 /* ---------- Paleta de RutaNeta ---------- */
@@ -534,6 +535,128 @@ button:focus-visible {
     padding: 1.5rem;
     text-align: center;
     color: var(--color-texto-suave);
+}
+
+/* =====================================================================
+   Etapa 5 · Gastos e historial
+   ===================================================================== */
+
+/* Checkbox "gasto fijo" con su texto al lado */
+.campo-check {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.6rem;
+}
+
+.campo-check input {
+    width: 1.2rem;
+    height: 1.2rem;
+    padding: 0;
+    accent-color: var(--color-primario);
+}
+
+/* Filtro por categoría: JS oculta y muestra filas sin recargar */
+.barra-filtro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+}
+
+.barra-filtro label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.barra-filtro select {
+    font: inherit;
+    padding: 0.45rem 0.6rem;
+    background: var(--color-blanco);
+    border: 1px solid var(--color-borde-campo);
+    border-radius: var(--radio);
+}
+
+/* Etiquetas de tipo de gasto */
+.etiqueta {
+    display: inline-block;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border-radius: 999px;
+}
+
+.etiqueta-fijo {
+    background: var(--color-secundario);
+    color: var(--color-blanco);
+}
+
+.etiqueta-variable {
+    background: var(--color-fondo);
+    color: var(--color-texto);
+    border: 1px solid var(--color-borde);
+}
+
+/* Barra del porcentaje de cada categoría */
+.barra {
+    width: 100%;
+    min-width: 6rem;
+    height: 0.6rem;
+    background: var(--color-fondo);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.barra span {
+    display: block;
+    height: 100%;
+    background: var(--color-primario);
+}
+
+/* Fila de totales al pie de las tablas */
+.tabla tfoot th,
+.tabla tfoot td {
+    font-weight: 800;
+    border-top: 2px solid var(--color-secundario);
+    border-bottom: none;
+}
+
+/* Historial: selector de mes */
+.filtro-mes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.filtro-mes .campo {
+    flex: 0 1 14rem;
+}
+
+/* Celda Neto: js/app.js agrega "positivo" o "negativo" según el data-neto que dejó PHP */
+.celda-neto {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.celda-neto.positivo {
+    background: var(--color-acento);
+    color: var(--color-secundario);
+}
+
+.celda-neto.negativo {
+    background: var(--color-peligro);
+    color: var(--color-blanco);
+}
+
+/* El mes elegido se distingue en la tabla de 6 meses */
+.tabla tbody tr.mes-elegido td {
+    font-weight: 700;
+}
+
+.tabla tbody tr.mes-elegido td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-primario);
 }
 
 /* ---------- Pantallas angostas: el menú lateral pasa arriba ---------- */
