@@ -10,8 +10,22 @@
 // Arranca (o retoma) la sesión. Con esto $_SESSION recuerda al conductor
 // mientras pasa de login.php a dashboard.php, ingresos.php, gastos.php...
 if (session_status() === PHP_SESSION_NONE) {
+    // Revisión de seguridad (etapa 6): la cookie de sesión se endurece antes de crearla.
+    //   httponly → JavaScript no puede leer la cookie: un XSS no se roba la sesión.
+    //   samesite Lax → el navegador no manda la cookie en POSTs que vienen de
+    //   otros sitios: segunda barrera contra CSRF, además del token.
+    session_set_cookie_params([
+        'lifetime' => 0,          // dura hasta cerrar el navegador
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
     session_start();
 }
+
+// Nadie puede cargar RutaNeta dentro de un <iframe> de otro sitio para engañar
+// al conductor y hacerle pulsar "Eliminar" sin que lo note (clickjacking).
+header('X-Frame-Options: DENY');
 
 // Mensaje que ven los formularios cuando el token CSRF no coincide
 const ERROR_CSRF = 'El formulario expiró o no vino de RutaNeta. Recarga la página e inténtalo de nuevo.';
