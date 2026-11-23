@@ -1,1 +1,499 @@
-/* styles.css — Estilos de la landing (CSS Grid). Se construye en la etapa 2. */
+/* =====================================================================
+   styles.css — Estilos de la landing (index.html)
+   El esqueleto de la página es CSS Grid; dentro de cada bloque, Flexbox.
+   El sistema interno (páginas PHP) usa otra hoja: css/estilos.css
+   ===================================================================== */
+
+/* ---------- Paleta y medidas de RutaNeta ---------- */
+:root {
+    --color-primario: #FF6B00;     /* naranja: acciones (botones) */
+    --color-secundario: #1A1A2E;   /* azul noche: banner, encabezados, footer */
+    --color-acento: #00C851;       /* verde: ganancia neta */
+    --color-fondo: #F5F5F5;
+    --color-texto: #2D2D2D;
+    --color-peligro: #E53E3E;
+    --color-blanco: #FFFFFF;
+    --color-borde: #E2E2E2;
+    --color-texto-suave: #5E5E6E;
+    --color-texto-banner: #D8D8E6;
+    --color-primario-hover: #E65F00;
+    --color-tinte: #FFF4EB;        /* naranja muy claro para hover */
+    --radio: 0.5rem;
+    --sombra: 0 2px 10px #1A1A2E14;
+}
+
+/* ---------- Reset ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-texto);
+    background: var(--color-fondo);
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+/* =====================================================================
+   CSS GRID: el mapa de la página
+   grid-template-areas dibuja el layout con nombres. Cada hijo de .pagina
+   dice en qué área vive con grid-area. Para cambiar el layout basta con
+   cambiar este mapa; el HTML no se toca.
+   ===================================================================== */
+.pagina {
+    display: grid;
+    grid-template-columns: 15rem 1fr;    /* columna fija para logo/menú, el resto flexible */
+    grid-template-rows: auto 1fr auto;   /* banner, contenido (crece), footer */
+    grid-template-areas:
+        "logo    header"
+        "sidebar cuerpo"
+        "footer  footer";
+    min-height: 100vh;
+}
+
+.logo    { grid-area: logo; }
+.banner  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.cuerpo  { grid-area: cuerpo; }
+.pie     { grid-area: footer; }
+
+/* ---------- Área logo ---------- */
+.logo {
+    background: var(--color-blanco);
+    border-right: 1px solid var(--color-borde);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+}
+
+.logo img {
+    width: 11rem;
+}
+
+.logo p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-secundario);
+}
+
+/* ---------- Área header (banner) ---------- */
+.banner {
+    background: var(--color-secundario);
+    color: var(--color-blanco);
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.banner .banner-etiqueta {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-primario);
+}
+
+.banner h1 {
+    font-size: 2.5rem;
+    line-height: 1.15;
+    max-width: 22ch;
+}
+
+.banner h1 span {
+    color: var(--color-acento);
+}
+
+.banner .banner-texto {
+    font-size: 1.1rem;
+    color: var(--color-texto-banner);
+    max-width: 60ch;
+}
+
+.banner .banner-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* ---------- Botones ---------- */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.4rem;
+    border-radius: var(--radio);
+    border: 2px solid transparent;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Texto azul noche sobre naranja: el blanco sobre #FF6B00 casi no se lee */
+.btn-primario {
+    background: var(--color-primario);
+    color: var(--color-secundario);
+}
+
+.btn-primario:hover {
+    background: var(--color-primario-hover);
+}
+
+.btn-contorno {
+    background: transparent;
+    color: var(--color-blanco);
+    border-color: var(--color-blanco);
+}
+
+.btn-contorno:hover {
+    background: var(--color-blanco);
+    color: var(--color-secundario);
+}
+
+.btn:focus-visible,
+.sidebar a:focus-visible,
+.pie a:focus-visible {
+    outline: 3px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
+/* ---------- Área sidebar ---------- */
+.sidebar {
+    background: var(--color-blanco);
+    border-right: 1px solid var(--color-borde);
+    padding: 1.5rem 1rem;
+}
+
+/* sticky: el menú se queda visible mientras bajas por la página */
+.sidebar nav {
+    position: sticky;
+    top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-texto-suave);
+    padding: 0 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.sidebar ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid transparent;
+    border-radius: 0 var(--radio) var(--radio) 0;
+    color: var(--color-secundario);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    background: var(--color-tinte);
+    border-left-color: var(--color-primario);
+}
+
+/* ---------- Área cuerpo ---------- */
+.cuerpo {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 0;   /* evita que la tabla ensanche la columna del Grid */
+}
+
+.bloque {
+    background: var(--color-blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bloque h2 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    color: var(--color-secundario);
+}
+
+.bloque p {
+    max-width: 65ch;
+}
+
+/* Bruto contra neto, lado a lado */
+.comparacion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.cifra {
+    flex: 1 1 14rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio);
+}
+
+.cifra .cifra-etiqueta {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-texto-suave);
+}
+
+.cifra .cifra-valor {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-secundario);
+}
+
+.cifra-neta {
+    background: var(--color-acento);
+    border-color: var(--color-acento);
+}
+
+.cifra-neta .cifra-etiqueta,
+.cifra-neta .cifra-valor {
+    color: var(--color-secundario);
+}
+
+/* Tabla de la semana */
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+.tabla-semana {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-semana th,
+.tabla-semana td {
+    padding: 0.7rem 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla-semana thead th {
+    background: var(--color-secundario);
+    color: var(--color-blanco);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.tabla-semana .num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabla-semana tbody tr:hover {
+    background: var(--color-tinte);
+}
+
+.tabla-semana tfoot th,
+.tabla-semana tfoot td {
+    background: var(--color-acento);
+    color: var(--color-secundario);
+    font-size: 1.15rem;
+    font-weight: 800;
+    border-bottom: none;
+}
+
+.nota {
+    font-weight: 600;
+    color: var(--color-secundario);
+}
+
+/* Beneficios: tarjetas que se acomodan solas con flex-wrap */
+.tarjetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tarjeta {
+    flex: 1 1 13rem;
+    background: var(--color-fondo);
+    border-top: 4px solid var(--color-primario);
+    border-radius: var(--radio);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tarjeta h3 {
+    font-size: 1.1rem;
+    color: var(--color-secundario);
+}
+
+.tarjeta p {
+    font-size: 0.95rem;
+}
+
+/* Formulario de registro rápido */
+.bloque-registro {
+    background: var(--color-secundario);
+    color: var(--color-blanco);
+}
+
+.bloque-registro h2 {
+    color: var(--color-blanco);
+}
+
+.form-registro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.form-registro .campo {
+    flex: 1 1 14rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-registro label {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.form-registro input {
+    font: inherit;
+    padding: 0.7rem 0.85rem;
+    border: 2px solid var(--color-blanco);
+    border-radius: var(--radio);
+    color: var(--color-texto);
+}
+
+.form-registro input:focus {
+    outline: 3px solid var(--color-primario);
+    outline-offset: 1px;
+}
+
+/* ---------- Área footer ---------- */
+.pie {
+    background: var(--color-secundario);
+    color: var(--color-texto-banner);
+    padding: 2rem 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 2.5rem;
+    font-size: 0.9rem;
+}
+
+.pie .pie-columna {
+    flex: 1 1 14rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.pie strong {
+    color: var(--color-blanco);
+}
+
+.pie a {
+    color: var(--color-blanco);
+    text-decoration-color: var(--color-primario);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+.pie .pie-legal {
+    width: 100%;
+    padding-top: 1rem;
+    border-top: 1px solid #FFFFFF26;
+}
+
+/* =====================================================================
+   Pantallas angostas: el mismo HTML con otro mapa de Grid.
+   Todo queda en una sola columna y el menú pasa a ser una fila de enlaces.
+   ===================================================================== */
+@media (max-width: 48rem) {
+    .pagina {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas:
+            "logo"
+            "header"
+            "sidebar"
+            "cuerpo"
+            "footer";
+    }
+
+    .logo,
+    .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--color-borde);
+    }
+
+    .banner {
+        padding: 2rem 1.25rem;
+    }
+
+    .banner h1 {
+        font-size: 1.9rem;
+    }
+
+    .sidebar {
+        padding: 0.75rem 1rem;
+    }
+
+    .sidebar nav {
+        position: static;
+    }
+
+    .sidebar h2 {
+        display: none;
+    }
+
+    .sidebar nav,
+    .sidebar ul {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .cuerpo {
+        padding: 1.25rem;
+    }
+
+    .bloque {
+        padding: 1.25rem;
+    }
+
+    .pie {
+        padding: 1.5rem 1.25rem;
+    }
+}
